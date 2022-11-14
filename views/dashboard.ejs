@@ -4,21 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Dashboard</title>
+    <title>Document</title>
 </head>
 <body>
     <div>
-        <h1>Hello, <%= first_name %> <%= last_name %></h1>
-        <div><a href="/logout">log off!</a></div>
-        </br>
-        </br>
-        <form action="/post" method="post">
-            <textarea name="message" id="" cols="30" rows="10"></textarea>
-            </br>
-            <input type="submit" value="Post a message">
+        <p>Hello <%= user.first_name %></p>
+        <p><a href="/users/logout">Log Off!</a></p>
+    </div>
+    <div>
+        <h1>This is my wall!</h1>
+
+        <h3>Post a message</h3>
+        <form action="/actions/post" method="post">
+            <textarea name="post" id="" cols="30" rows="10"></textarea>
+            </br>   
+            <input type="submit" value="Create a message">
         </form>
     </div>
 
-    <%- post_comment_view %>
+    <div>
+        <% 
+            if(posts.length){ 
+                for(let post_index in posts){
+                    let post = posts[post_index]; 
+                    let comments = JSON.parse(post.post_comments);
+        %>
+            <div>
+                <h1>Message from <%= post.post_full_name %></h1>
+                <% if(user.id == post.user_id  && post.is_delete) { %>
+                    <form action="/actions/delete_post" method="post">
+                        <input type="hidden" name="post_id" value='<%= post.post_id%>'>
+                        <input type="submit" value="Delete post">
+                    </form>
+                <% }%>
+                <p style="margin-left: 20px"><%= post.message %></p>
+                <%
+                    for(let comment_index in comments){
+                        let comment = comments[comment_index];
+
+                        if(comment.comment_id){ 
+                %>
+                            <div style="margin-left: 20px">
+                                <h3>Comment from <%= comment.comment_full_name %></h3>
+                                <p><%= comment.message %></p>
+
+                                    <% if(user.id == comment.user_id && comment.is_delete) { %>
+                                        <form action="/actions/delete_post" method="post">
+                                            <input type="hidden" name="comment_id" value='<%= comment.comment_id%>'>
+                                            <input type="submit" value="Delete comment">
+                                        </form>
+                                    <% }%>
+                            </div>
+                <%  
+                        }
+                    }
+                %>
+                <div>
+                    <h3>Post a comment </h3>
+                    <form action="/actions/post" method="post">
+                        <input type="hidden" name="post_id" value="<%= post.post_id %>">
+                        <textarea name="post" id="" cols="30" rows="10"></textarea>
+                        </br>   
+                        <input type="submit" value="Create a comment">
+                    </form>
+                </div>
+            </div>
+        <%   
+                }
+            } 
+        %>
+    </div>
 </body>
 </html>
