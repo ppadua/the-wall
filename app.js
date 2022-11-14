@@ -16,11 +16,14 @@ App.use(Session({
     cookie: {secure: false }
 }));
 
-let userViewRouter = require("./routes/user_views.routes")
-App.use("/", userViewRouter);
-
 let userRouter = require("./routes/users.routes")
 App.use("/users", userRouter);
+
+let userActionRouter = require("./routes/user_actions.routes");
+App.use("/actions", userActionRouter);
+
+let userViewRouter = require("./routes/user_views.routes")
+App.use("/", userViewRouter);
 
 
 App.listen(3000, () => {

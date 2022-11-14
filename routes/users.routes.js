@@ -4,7 +4,7 @@ let userController = require("../controllers/users.controller");
 
 router.post("/register", userController.register);
 router.post("/login", userController.login);
-router.post("/logout", userController.logout);
+router.get("/logout", userController.logout);
 
 
 module.exports = router;
