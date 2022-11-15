@@ -10,7 +10,7 @@ class DatabaseConfiguraiton{
             host: "localhost",
             user: "new_root",
             password: "new_root",
-            database: "wall_challenge",
+            database: "wall",
             port: "3306",
         }))
     }

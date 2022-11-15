@@ -8,60 +8,75 @@ class UserController{
     constructor(){ }
 
     register = async function(req, res){
-        let check_fields = GlobalHelper.checkFields(["username", "password", "confirm_password", "first_name", "last_name"], [], req.body);
+        let response_data = {status: false, result:{}};
 
-        if(check_fields.status){
-            if(req.body.confirm_password === req.body.password){
-                let user_register = await UserModel.register({
+        try{
+            let check_fields = GlobalHelper.checkFields(["username", "password", "confirm_password", "first_name", "last_name"], [], req.body);
+
+            if(check_fields.status){
+                if(req.body.confirm_password === req.body.password){
+                    let user_register = await UserModel.register({
+                        username: req.body.username,
+                        password: Encryption(`${req.body.password}thewall`),
+                        first_name: req.body.first_name,
+                        last_name: req.body.last_name
+                    });
+
+                    if(user_register.status){
+                        req.session.user = user_register.result;
+                        req.session.save();
+
+                        response_data = user_register;
+                    }
+                    else{
+                        response_data.error = "Something went wrong";
+                    }
+                }
+                else{
+                    response_data.error = "Something went wrong";
+                }
+            }
+            else{
+                response_data = check_fields;
+            }
+        }
+        catch(error){
+            response_data.error = error;
+        }
+
+        res.json(response_data);    
+    }
+
+    login = async function(req, res){
+        let response_data = {status: false, result:{}};
+
+        try{
+            let check_fields = GlobalHelper.checkFields(["username", "password"], [], req.body);
+    
+            if(check_fields.status){
+                let user_register = await UserModel.login({
                     username: req.body.username,
-                    password: Encryption(`${req.body.password}thewall`),
-                    first_name: req.body.first_name,
-                    last_name: req.body.last_name
+                    password: req.body.password
                 });
     
                 if(user_register.status){
                     req.session.user = user_register.result;
-                    req.session.save(function(){
-                        res.redirect("/dashboard");
-                    })
+                    req.session.save();
+                    response_data = user_register;
                 }
                 else{
-                    let error_message = user_register.message ? user_register.message : "Something went wrong in registering your account";
-    
-                    GlobalHelper.alertMessage(res, error_message, "/");
-                }
+                    response_data = user_register;
+                }   
             }
             else{
-                GlobalHelper.alertMessage(res, `Password not match`, "/");
+                response_data = check_fields;
             }
         }
-        else{
-            GlobalHelper.alertMessage(res, `Missing data, ${check_fields.result.missing_fields.join(",")}`, "/");
+        catch(error){
+            response_data.error = error;
         }
-    }
 
-    login = async function(req, res){
-        let check_fields = GlobalHelper.checkFields(["username", "password"], [], req.body);
-
-        if(check_fields.status){
-            let user_register = await UserModel.login({
-                username: req.body.username,
-                password: req.body.password
-            });
-
-            if(user_register.status){
-                req.session.user = user_register.result;
-                req.session.save(function(){
-                    res.redirect("/dashboard");
-                })
-            }
-            else{
-                GlobalHelper.alertMessage(res, `Invalid account`, "/");
-            }   
-        }
-        else{
-            GlobalHelper.alertMessage(res, `Missing data, ${check_fields.result.missing_fields.join(",")}`, "/");
-        }
+        res.json(response_data);    
     }
 
     logout = function(req,res) {
