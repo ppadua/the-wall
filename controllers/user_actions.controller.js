@@ -1,75 +1,75 @@
-let GlobalHelper  = require("../helpers/index");
-let UserActionsModel = require("../models/user_actions.model"); 
+let Ejs        = require("ejs");
+let Path       = require("path");
+let Encryption = require('md5');
+let UserActionModel  = require("../models/user_actions.model")
+let GlobalHelper = require("../helpers/index");
 
-class UserActionsController {
-    constructor(){}
+class UserActionController{
+    constructor(){ }
 
-    post = async function(req, res){
+    create_post = async function(req, res){
+        let response_data = {status: false, result:{}};
+
         try{
-            let check_field = GlobalHelper.checkFields(["post"], ["post_id"], req.body);
+            let check_fields = GlobalHelper.checkFields(["message"], ["post_id"], req.body);
 
-            if(check_field.status){
-                if(req.session.user){
-                    let post_details = { user_id: req.session.user.id, message: check_field.result.post };
+            if(check_fields.status){
+                let message_data = {
+                    user_id: req.session.user.id,
+                    message: check_fields.result.message
+                }
+                if(check_fields.result.post_id){
+                    message_data.post_id = check_fields.result.post_id
+                }
 
-                    if(check_field.result.post_id){
-                        post_details.post_id = check_field.result.post_id;
-                    }
-                    
-                    let post = await UserActionsModel.postMessage(post_details, check_field.result.post_id ? true: false);
+                let user_register = await UserActionModel.create_post(message_data, !check_fields.result.post_id);
 
-                    if(post.status){
-                        res.redirect("/dashboard");
-                    }
-                    else{
-                        GlobalHelper.alertMessage(res, `Someting went wrong on creating message!`, "/dashboard");
-                    }
+                if(user_register.status){
+                    response_data.status = true;
                 }
                 else{
-                    GlobalHelper.alertMessage(res, `No session found!`, "/");
+                    response_data.error = "Something went wrong";
                 }
             }
             else{
-                GlobalHelper.alertMessage(res, `Missing data, ${check_fields.result.missing_fields.join(",")}`, "/dashboard");
+                response_data = check_fields;
             }
-        } 
-        catch(error){
-            GlobalHelper.alertMessage(res, `Something went wrong on posting message!`, "/dashboard");
         }
+        catch(error){
+            response_data.error = error;
+        }
+
+        res.json(response_data);    
     }
 
-    deletePost = async function(req, res){
+    delete_post = async function(req, res){
+        let response_data = {status: false, result:{}};
+
         try{
-            let check_field = GlobalHelper.checkFields([], ["post_id", "comment_id"], req.body);
+            let check_fields = GlobalHelper.checkFields(["record_id"], ["post_id"], req.body);
 
-            if(check_field.status){
-                if(req.session.user){
-                    let post_details = { user_id: req.session.user.id};
-                    post_details.record_id = check_field.result.post_id  ? check_field.result.post_id : check_field.result.comment_id;
-                    
-                    let post = await UserActionsModel.deleteMessage(post_details, check_field.result.post_id ? true: false);
+            if(check_fields.status){
+                let user_register = await UserActionModel.delete_post(check_fields.result.record_id, check_fields.result.post_id);
 
-                    if(post.status){
-                        res.redirect("/dashboard");
-                    }
-                    else{
-                        GlobalHelper.alertMessage(res, `Someting went wrong on creating message!`, "/dashboard");
-                    }
+                if(user_register.status){
+                    response_data.status = true;
                 }
                 else{
-                    GlobalHelper.alertMessage(res, `No session found!`, "/");
+                    response_data.error = "Something went wrong";
                 }
             }
             else{
-                GlobalHelper.alertMessage(res, `Missing data, ${check_fields.result.missing_fields.join(",")}`, "/dashboard");
+                response_data = check_fields;
             }
-        } 
-        catch(error){
-            GlobalHelper.alertMessage(res, `Something went wrong on posting message!`, "/dashboard");
         }
+        catch(error){
+            response_data.error = error;
+        }
+
+        res.json(response_data);    
     }
 }
 
 module.exports = (function Users(){
-    return new UserActionsController();
+    return new UserActionController();
 }())

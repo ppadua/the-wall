@@ -1,8 +1,4 @@
-let Ejs        = require("ejs");
-let Path       = require("path");
-let Encryption = require('md5');
 let UserActionsModel  = require("../models/user_actions.model")
-let GlobalHelper  = require("../helpers/index");
 
 class UserController{
     constructor(){ }
@@ -19,8 +15,10 @@ class UserController{
     dashboard = async function(req,res){
         try{
             if(req.session.user !== undefined){
-                let posts = await UserActionsModel.getMessages();
-                res.render("dashboard", {user: req.session.user, posts :  posts.result});
+                let posts = await UserActionsModel.getPost();
+                let user = req.session.user;
+
+                res.render("dashboard", {posts: posts.result, user});
             }
             else{
                 res.redirect("/");

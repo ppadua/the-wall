@@ -5,22 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="../assets/js/login.js"></script>
 </head>
 <body>
     <div>
         <h1>Login</h1>
-        <form action="/users/login" method="post">
-            <input type="text" name="username" placeholder="Username">
+        <form action="" method="post" id="login">
+            <input type="text" name="username" placeholder="Username" value="pauljohn">
             <input type="password" name="password" placeholder="Password">
             <input type="submit" value="Login">
         </form>
     </div>
     <div>
         <h1>Register</h1>
-        <form action="/users/register" method="post">
-            <input type="text" name="first_name" placeholder="First Name">
-            <input type="text" name="last_name" placeholder="Last Name">
-            <input type="text" name="username" placeholder="Username">
+        <form action="" method="post" id="register">
+            <input type="text" name="first_name" placeholder="First Name" value="Paul">
+            <input type="text" name="last_name" placeholder="Last Name" value="Padua">
+            <input type="text" name="username" placeholder="Username" value="pauljohn">
             <input type="password" name="password" placeholder="Password">
             <input type="password" name="confirm_password" placeholder="Confirm Password">
             <input type="submit" value="Register">
